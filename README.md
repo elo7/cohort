@@ -1,4 +1,4 @@
-# cohort_analysis
+# cohort
 
 > Cohort Analysis plugin built with love at Elo7
 

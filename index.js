@@ -5,17 +5,14 @@ export default function (kibana) {
     require: ['elasticsearch'],
 
     uiExports: {
-      
-      
+      visTypes: ['plugins/cohort/cohort']
     },
 
     config(Joi) {
       return Joi.object({
         enabled: Joi.boolean().default(true),
       }).default();
-    },
-
-    
+    }
 
   });
 };

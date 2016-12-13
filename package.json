@@ -1,10 +1,10 @@
 {
-  "name": "cohort_analysis",
+  "name": "cohort",
   "version": "0.0.0",
   "description": "Cohort Analysis plugin built with love at Elo7",
   "main": "index.js",
   "kibana": {
-    "version": "5.0.0"
+    "version": "5.0.3"
   },
   "scripts": {
     "lint": "eslint",
