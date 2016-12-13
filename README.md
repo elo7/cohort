@@ -1,6 +1,6 @@
-# cohort_analysis
+# cohort_plugin
 
-> Cohort analysis plugin built with love at Elo7
+> An awesome Kibana plugin
 
 ---
 
