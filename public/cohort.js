@@ -33,15 +33,15 @@ function CohortProvider(Private) {
             }]
         }, {
             group: 'buckets',
-            name: 'cohort_data',
-            title: 'Cohort',
+            name: 'cohort_period',
+            title: 'Cohort Period',
             min: 1,
             max: 1,
             aggFilter: 'histogram'
         }, {
             group: 'buckets',
-            name: 'safra_data',
-            title: 'Safra',
+            name: 'cohort_date',
+            title: 'Cohort Date',
             max: 1,
             aggFilter: 'date_histogram'
         }])
