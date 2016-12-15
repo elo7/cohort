@@ -2,6 +2,7 @@
 
 import 'plugins/cohort/cohort.css'
 import cohort_controller from 'plugins/cohort/cohort_controller';
+import cohort_params_template from 'plugins/cohort/cohort_params.html';
 import TemplateVisTypeTemplateVisTypeProvider from 'ui/template_vis_type/template_vis_type';
 import VisSchemasProvider from 'ui/vis/schemas';
 
@@ -14,37 +15,51 @@ function CohortProvider(Private) {
     const Schemas = Private(VisSchemasProvider);
 
     return new TemplateVisType({
-        name: 'cohort', // The internal id of the vis (must be unique)
-        title: 'Cohort Analysis', // The title of the vis, shown to the user
-        description: 'Cohort analysis plugin built with love at Elo7', // The description of this vis
+        name: 'cohort',
+        title: 'Cohort Analysis',
+        description: 'Cohort analysis plugin built with love at Elo7',
         icon: 'fa-user', // The font awesome icon of this visualization
-        // The template, that will be rendered for this visualization
         template: require('plugins/cohort/cohort.html'),
-        // Define the aggregation your visualization accepts
-        schemas: new Schemas([{
-            group: 'metrics',
-            name: 'metric',
-            title: 'Total',
-            min: 1,
-            aggFilter: ['count'],
-            defaults: [{
-                type: 'count',
-                schema: 'metric'
-            }]
-        }, {
-            group: 'buckets',
-            name: 'cohort_period',
-            title: 'Cohort Period',
-            min: 1,
-            max: 1,
-            aggFilter: 'histogram'
-        }, {
-            group: 'buckets',
-            name: 'cohort_date',
-            title: 'Cohort Date',
-            max: 1,
-            aggFilter: 'date_histogram'
-        }])
+        params: {
+            defaults: {
+                percentual: false
+            },
+            editor: cohort_params_template
+        },
+        hierarchicalData: function (vis) {
+            return Boolean(true);
+        },
+        schemas:
+            new Schemas([
+            {
+                group: 'metrics',
+                name: 'metric',
+                title: 'Total',
+                max: 1,
+                min: 1,
+                aggFilter: ['count', 'sum'],
+                defaults: [{
+                    type: 'count',
+                    schema: 'metric'
+                }]
+            },
+            {
+                group: 'buckets',
+                name: 'cohort_date',
+                title: 'Cohort Date',
+                min: 1,
+                max: 1,
+                aggFilter: 'date_histogram'
+            },
+            {
+                group: 'buckets',
+                name: 'cohort_period',
+                title: 'Cohort Period',
+                min: 1,
+                max: 1,
+                aggFilter: 'histogram'
+            }
+        ])
     });
 }
 

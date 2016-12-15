@@ -7,13 +7,11 @@ module.controller('cohort_controller', function($scope, $element, Private) {
 
     const tabifyAggResponse = Private(AggResponseTabifyTabifyProvider);
 
-    $scope.$watch('esResponse', function(resp) {
+    $scope.$watchMulti(['esResponse', 'vis.params'], function ([resp]) {
         if (!resp) {
             return;
         }
 
-        // todo soma cumulativa (http://bl.ocks.org/jltran/bcd2a30fd9c08f8b9f87)
-        // todo percentual
         // todo tooltip / legenda (http://bl.ocks.org/d3noob/a22c42db65eb00d4e369)
 
         var $div = $element.empty(),
@@ -29,6 +27,13 @@ module.controller('cohort_controller', function($scope, $element, Private) {
 
         var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+        var percentCumulative = function(d) { return (d.cumValue / d.total) * 100; };
+        var cumulative = function(d) { return d.cumValue; };
+
+        console.log($scope.vis.params);
+
+        var yValue = $scope.vis.params.percentual ? percentCumulative : cumulative;
+
         var x = d3.scale.linear().range([0, width]),
             y = d3.scale.linear().range([height, 0]),
             z = d3.scale.category20();
@@ -36,7 +41,7 @@ module.controller('cohort_controller', function($scope, $element, Private) {
         var line = d3.svg.line()
             // .curve(d3.curveBasis)
             .x(function(d) { return x(d.period); })
-            .y(function(d) { return y(d.cumValue); });
+            .y(function(d) { return y(yValue(d)); });
 
         var xAxis = d3.svg.axis()
             .scale(x)
@@ -48,11 +53,14 @@ module.controller('cohort_controller', function($scope, $element, Private) {
 
         var esData = tabifyAggResponse($scope.vis, resp);
 
+        console.log("esData.tables[0].rows", esData.tables[0].rows);
+
         var data = esData.tables[0].rows.map(function(row) {
             return {
-                "period": row[0],
-                "date": new Date(row[1]),
-                "value": row[2]
+                "date": new Date(row[0]),
+                "total": row[1],
+                "period": row[2],
+                "value": row[3]
             };
          });
 
@@ -73,7 +81,7 @@ module.controller('cohort_controller', function($scope, $element, Private) {
         console.log("Data", data);
 
         x.domain(d3.extent(data, function(d) { return d.period; }));
-        y.domain([0, d3.max(data, function(d) { return d.cumValue; })]);
+        y.domain([0, d3.max(data, yValue)]);
 
         var formatTime = d3.time.format("%Y-%m-%d");
         var dataNest = d3.nest()
@@ -91,7 +99,14 @@ module.controller('cohort_controller', function($scope, $element, Private) {
 
         g.append("g")
             .attr("class", "axis axis--y")
-            .call(yAxis);
+            .call(yAxis)
+            .append("text")
+            .attr("y", 6)
+            .attr("x", 6)
+            .attr("dy", ".45em")
+            .style("font", "10px sans-serif")
+            .style("text-anchor", "start")
+            .text($scope.vis.params.percentual ? "Percentual %" : "Total Count");;
 
         var cohortDate = g.selectAll(".cohortDate")
             .data(dataNest)
@@ -106,9 +121,9 @@ module.controller('cohort_controller', function($scope, $element, Private) {
 
         cohortDate.append("text")
             .datum(function(d) { return {id: d.key, value: d.values[d.values.length - 1]}; })
-            .attr("transform", function(d) { return "translate(" + x(d.value.period) + "," + y(d.value.cumValue) + ")"; })
+            .attr("transform", function(d) { return "translate(" + x(d.value.period) + "," + y(yValue(d.value)) + ")"; })
             .attr("x", 3)
-            .attr("dy", "0.35em")
+            .attr("dy", "0.45em")
             .style("font", "10px sans-serif")
             .text(function(d) { return d.id; });
 
