@@ -12,8 +12,6 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             return;
         }
 
-        // todo tooltip / legenda (http://bl.ocks.org/d3noob/a22c42db65eb00d4e369)
-
         var $div = $element.empty(),
             margin = { top: 40, right: 80, bottom: 40, left: 50 },
             $closest = $div.closest('div.visualize-chart'),
@@ -29,8 +27,6 @@ module.controller('cohort_controller', function($scope, $element, Private) {
 
         var percentCumulative = function(d) { return (d.cumValue / d.total) * 100; };
         var cumulative = function(d) { return d.cumValue; };
-
-        console.log($scope.vis.params);
 
         var yValue = $scope.vis.params.percentual ? percentCumulative : cumulative;
 
@@ -51,9 +47,12 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             .scale(y)
             .orient("left").ticks(5);
 
-        var esData = tabifyAggResponse($scope.vis, resp);
+        var tooltip = d3.select("body")
+            .append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
 
-        console.log("esData.tables[0].rows", esData.tables[0].rows);
+        var esData = tabifyAggResponse($scope.vis, resp);
 
         var data = esData.tables[0].rows.map(function(row) {
             return {
@@ -78,8 +77,6 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             cumulativeData[d.date] = d.cumValue;
         });
 
-        console.log("Data", data);
-
         x.domain(d3.extent(data, function(d) { return d.period; }));
         y.domain([0, d3.max(data, yValue)]);
 
@@ -90,7 +87,29 @@ module.controller('cohort_controller', function($scope, $element, Private) {
 
         z.domain(dataNest.map(function(d) { return d.key; }));
 
-        console.log("DataNest", dataNest);
+        g.selectAll("dot_x")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr("r", 5)
+            .attr("cx", function(d) { return x(d.period); })
+            .attr("cy", function(d) { return y(yValue(d)); })
+            .style("fill", function(d) { return z(formatTime(d.date)); })
+            .style("opacity", 1)
+            .on("mouseover", function(d) {
+                tooltip.transition()
+                   .duration(100)
+                   .style("opacity", .9);
+                tooltip.html(formatTime(d.date) + " ( " + d.period + " ) <br/>" + Math.round(yValue(d) * 100) / 100)
+                    .style("background", z(formatTime(d.date)))
+                    .style("left", (d3.event.pageX + 5) + "px")
+                    .style("top", (d3.event.pageY - 35) + "px");
+                })
+            .on("mouseout", function(d) {
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            });
 
         g.append("g")
             .attr("class", "axis axis--x")
@@ -119,13 +138,32 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             .attr("d", function(d) { return line(d.values); })
             .style("stroke", function(d) { return z(d.key); });
 
-        cohortDate.append("text")
-            .datum(function(d) { return {id: d.key, value: d.values[d.values.length - 1]}; })
-            .attr("transform", function(d) { return "translate(" + x(d.value.period) + "," + y(yValue(d.value)) + ")"; })
-            .attr("x", 3)
-            .attr("dy", "0.45em")
+        var legend = g.append('g')
+            .attr("class", "legend")
+            .attr("x", 10)
+            .attr("y", 35)
+            .attr("height", 100)
+            .attr("width", 100);
+
+        legend.selectAll("rect")
+            .data(dataNest)
+            .enter()
+            .append("rect")
+            .attr("x", 10)
+            .attr("y", function(d, i){ return i *  20 + 20;})
+            .attr("width", 10)
+            .attr("height", 10)
+            .style("fill", function(d) { return z(d.key); });
+
+        legend.selectAll("text")
+            .data(dataNest)
+            .enter()
+            .append("text")
+            .attr("x", 30)
+            .attr("y", function(d, i){ return i *  20 + 28;})
             .style("font", "10px sans-serif")
-            .text(function(d) { return d.id; });
+            .text(function(d) { return d.key; });
+
 
      });
 });
