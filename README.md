@@ -1,8 +1,22 @@
 # cohort
 
-> Cohort Analysis plugin built with love at Elo7
+Cohort Analysis plugin built with love at Elo7
 
----
+TODO add print
+
+## install
+
+```
+bin/kibana-plugin install https://github.com/elo7/cohort/releases/download/0.0.1/cohort-0.0.1.zip
+```
+
+
+## uninstall
+
+```
+bin/kibana-plugin remove cohort
+```
+
 
 ## development
 
