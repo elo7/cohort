@@ -1,22 +1,29 @@
-# cohort
+# Kibana Cohort analysis chart plugin
 
-Cohort Analysis plugin built with love at Elo7
+![Chart screenshot](/images/chart.png?raw=true)
 
-TODO add print
+## description
+
+From [Wikipedia](https://en.wikipedia.org/wiki/Cohort_analysis):
+> Cohort analysis is a subset of behavioral analytics that takes the data from a given dataset (e.g. an eCommerce platform, web application, or online game) and rather than looking at all users as one unit, it breaks them into related groups for analysis. These related groups, or cohorts, usually share common characteristics or experiences within a defined time-span. Cohort analysis allows a company to “see patterns clearly across the life-cycle of a customer (or user), rather than slicing across all customers blindly without accounting for the natural cycle that a customer undergoes.
+
+## usage
+
+ - The **total** metric is the value that determine y-axis. Can be either a count or a sum. It also possible to use the percentual as y value just marking the option `Show percetual values`.
+ - The **cohort date** bucket is the date used to draw the chart lines. Each bucket is a line in this chart. It should be a date histogram.
+ - The **cohort period** bucket is the "cohort" itself that determine the x-axis. It should be a numeric histogram.
 
 ## install
 
 ```
-bin/kibana-plugin install https://github.com/elo7/cohort/releases/download/0.0.1/cohort-0.0.1.zip
+bin/kibana-plugin install https://github.com/elo7/cohort/releases/download/5.1.1/cohort-5.1.1.zip
 ```
-
 
 ## uninstall
 
 ```
 bin/kibana-plugin remove cohort
 ```
-
 
 ## development
 
@@ -30,10 +37,6 @@ See the [kibana contributing guide](https://github.com/elastic/kibana/blob/maste
 
     You can pass any argument that you would normally send to `bin/kibana` by putting them after `--` when running `npm start`
 
-  - `npm run build`
-
-    Build a distributable archive
-
   - `npm run test:browser`
 
     Run the browser tests in a real web browser
@@ -43,3 +46,13 @@ See the [kibana contributing guide](https://github.com/elastic/kibana/blob/maste
     Run the server tests using mocha
 
 For more information about any of these commands run `npm run ${task} -- --help`.
+
+## distribuition
+
+Remember that the plugin version in `package.json` should match Kibana version.
+
+  - `npm run build`
+
+    Build a distributable archive
+
+

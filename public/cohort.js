@@ -17,7 +17,7 @@ function CohortProvider(Private) {
     return new TemplateVisType({
         name: 'cohort',
         title: 'Cohort Analysis',
-        description: 'Cohort analysis plugin built with love at Elo7',
+        description: 'Cohort analysis plugin',
         icon: 'fa-user', // The font awesome icon of this visualization
         template: require('plugins/cohort/cohort.html'),
         params: {
