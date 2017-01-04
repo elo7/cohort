@@ -3,9 +3,6 @@
   "version": "5.1.1",
   "description": "Cohort Analysis plugin built with love at Elo7",
   "main": "index.js",
-  "kibana": {
-    "version": "5.1.1"
-  },
   "scripts": {
     "lint": "eslint",
     "start": "plugin-helpers start",

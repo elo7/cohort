@@ -1,0 +1,42 @@
+{
+    "non-interactive": true,
+    "dry-run": false,
+    "verbose": true,
+    "force": false,
+    "pkgFiles": ["package.json"],
+    "increment": "patch",
+    "prereleaseId": null,
+    "commitMessage": "Release %s",
+    "tagName": "%s",
+    "tagAnnotation": "Release %s",
+    "buildCommand": "npm run build",
+    "changelogCommand": "git log --pretty=format:'* %s (%h)' [REV_RANGE]",
+    "requireCleanWorkingDir": false,
+    "src": {
+        "pushRepo": null,
+        "beforeStartCommand": false,
+        "beforeStageCommand": false,
+        "afterReleaseCommand": false
+    },
+    "dist": {
+        "repo": false,
+        "stageDir": ".stage",
+        "baseDir": ".",
+        "files": ["**/*"],
+        "pkgFiles": false,
+        "beforeStageCommand": false,
+        "afterReleaseCommand": false
+    },
+    "npm": {
+        "publish": false,
+        "publishPath": ".",
+        "tag": "latest",
+        "private": false,
+        "forcePublishSourceRepo": false
+    },
+    "github": {
+        "release": false,
+        "releaseName": "%s",
+        "tokenRef": "GITHUB_TOKEN"
+    }
+}
