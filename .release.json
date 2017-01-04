@@ -13,7 +13,7 @@
     "changelogCommand": "git log --pretty=format:'* %s (%h)' [REV_RANGE]",
     "requireCleanWorkingDir": false,
     "src": {
-        "pushRepo": "origin master",
+        "pushRepo": "-u origin master",
         "beforeStartCommand": false,
         "beforeStageCommand": false,
         "afterReleaseCommand": false
