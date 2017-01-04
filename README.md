@@ -47,12 +47,16 @@ See the [kibana contributing guide](https://github.com/elastic/kibana/blob/maste
 
 For more information about any of these commands run `npm run ${task} -- --help`.
 
-## distribuition
+## manual distribution
 
-Remember that the plugin version in `package.json` should match Kibana version.
+Remember that the plugin version in `package.json` must match Kibana version.
 
-  - `npm run build`
+```
+export $VERSION=<kibana_version>
+export $GITHUB_TOKEN=<token>
 
-    Build a distributable archive
+npm install
 
-
+node_modules/release-it/bin/release.js $VERSION  -e
+node_modules/publish-release/bin/publish-release --token $GITHUB_TOKEN --owner elo7 --repo cohort --assets build/cohort-$VERSION.zip --tag $VERSION --name $VERSION --notes 'Release for Kibana '$VERSION'
+```
