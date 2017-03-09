@@ -66,12 +66,7 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             .enter()
             .append('tr');
 
-        var domain = d3.extent(data, valueFn);
-        domain.splice(1, 0, d3.mean(domain));
-
-        var colorScale = d3.scale.linear()
-            .domain(domain)
-            .range(["#ff4e61","#ffef7d","#32c77c"]);
+        var colorScale = getColorScale($scope, data, valueFn);
 
         var cells = rows.selectAll('td')
             .data(function(row){
@@ -86,13 +81,13 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             .enter()
             .append('td')
             .style("background-color", function(d,i) {
-                if (i >= 2) {
+                if (i >= 2) { // skip first and second columns
                     return colorScale(d);
                 }
             })
             .text(function (d) { return d; });
 
-        var allMeans = ["-", "Medias"].concat(periodMeans);
+        var allMeans = ["-", "Mean"].concat(periodMeans);
 
         tfoot.append('tr')
             .selectAll('td')
@@ -232,6 +227,19 @@ module.controller('cohort_controller', function($scope, $element, Private) {
 
         return valueFn;
 
+    }
+
+    function getColorScale($scope, data, valueFn) {
+        if ($scope.vis.params.mapColors) {
+
+            var domain = d3.extent(data, valueFn);
+            domain.splice(1, 0, d3.mean(domain));
+
+            return d3.scale.linear().domain(domain).range(["#ff4e61","#ffef7d","#32c77c"]);
+
+        } else {
+            return function(d) { };
+        }
     }
 
     function processData($vis, resp) {

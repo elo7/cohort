@@ -11,4 +11,8 @@
     <input type="checkbox" ng-model="vis.params.table">
     Show values as table
   </label>
+  <label>
+    <input type="checkbox" ng-model="vis.params.mapColors"  ng-disabled="!vis.params.table" >
+    Show heatmap colors
+  </label>
 </div>
