@@ -20,9 +20,53 @@ div.tooltip {
     pointer-events: none;
 }
 
-.cohort_table,
+.cohort_table tr:last-child td,
+.cohort_table tfoot td {
+  border-bottom: none;
+}
+
+ .cohort_table thead tr th:nth-child(-n + 2){
+  min-width: 70px;
+ }
+
 .cohort_table th,
-.cohort_table tr,
-.cohort_table td {
-  border: 1px solid black;
+.cohort_table tbody tr td:nth-child(-n + 2),
+.cohort_table tfoot td {
+  border-bottom: 1px solid #E4E4E4;
+  border-right: 1px solid #E4E4E4;
+  color: #3A3838;
+  font-weight: bold;
+}
+
+.cohort_table {
+  font-size: 9pt;
+  margin: auto;
+  margin-top: 10px;
+  border-spacing: 0;
+  border-collapse: collapse;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  background-color: #F5F3F3;
+}
+
+.cohort_table tbody td:last-child {
+  -webkit-border-bottom-right-radius: 5px;
+  -moz-border-bottom-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.cohort_table tr:first-child th:last-child,
+.cohort_table tfoot td:last-child {
+  border-right: none;
+}
+
+.cohort_table tfoot td {
+  border-top: 1px solid #E4E4E4;
+}
+
+.cohort_table td, .cohort_table th{
+  width: 42px;
+  text-align: center;
+  padding: 10px;
 }

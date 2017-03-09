@@ -25,14 +25,14 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             id = $div.attr('id');
 
         if ($scope.vis.params.table) {
-            showTable($scope, id, margin, width, height, data, valueFn);
+            showTable($scope, id, width, height, data, valueFn);
         } else {
             showGraph($scope, id, margin, width, height, data, valueFn);
         }
 
     });
 
-    function showTable($scope, id, margin, width, height, data, valueFn) {
+    function showTable($scope, id, width, height, data, valueFn) {
 
         var periodMeans = d3.nest().key(function(d) { return d.period; }).entries(data).map(function(d){
             return round(d3.mean(d.values, valueFn));
@@ -66,6 +66,13 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             .enter()
             .append('tr');
 
+        var domain = d3.extent(data, valueFn);
+        domain.splice(1, 0, d3.mean(domain));
+
+        var colorScale = d3.scale.linear()
+            .domain(domain)
+            .range(["#ff4e61","#ffef7d","#32c77c"]);
+
         var cells = rows.selectAll('td')
             .data(function(row){
                 var date = row.key;
@@ -78,6 +85,11 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             })
             .enter()
             .append('td')
+            .style("background-color", function(d,i) {
+                if (i >= 2) {
+                    return colorScale(d);
+                }
+            })
             .text(function (d) { return d; });
 
         var allMeans = ["-", "Medias"].concat(periodMeans);
@@ -88,7 +100,6 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             .enter()
             .append('td')
             .text(function (d) { return d; });
-
     }
 
     function showGraph($scope, id, margin, width, height, data, valueFn) {
@@ -245,6 +256,5 @@ module.controller('cohort_controller', function($scope, $element, Private) {
         return data;
 
     }
-
 });
 
