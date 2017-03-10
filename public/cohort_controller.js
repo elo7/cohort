@@ -34,17 +34,26 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             margin = { top: 40, right: 80, bottom: 40, left: 50 },
             width = $closest.width() - margin.left - margin.right,
             height = $closest.height() - margin.top - margin.bottom,
-            id = $div.attr('id');
+            id = $div.attr('id'),
+            meassures = {
+                width : width,
+                height : height,
+                margin : margin,
+                allWidth : width + margin.right + margin.left,
+                allHeight : height + margin.top + margin.bottom,
+
+            };
+
 
         if ($scope.vis.params.table) {
-            showTable($scope, id, width, data, valueFn, formatTime);
+            showTable($scope, id, meassures, data, valueFn, formatTime);
         } else {
-            showGraph($scope, id, margin, width, height, data, valueFn, formatTime);
+            showGraph($scope, id, meassures, data, valueFn, formatTime);
         }
 
     });
 
-    function showTable($scope, id, width, data, valueFn, formatTime) {
+    function showTable($scope, id, meassures, data, valueFn, formatTime) {
 
         var periodMeans = d3.nest().key(function(d) { return d.period; }).entries(data).map(function(d){
             return round(d3.mean(d.values, valueFn));
@@ -58,7 +67,7 @@ module.controller('cohort_controller', function($scope, $element, Private) {
         var rowsData = d3.map(data, function(d){return d.date; }).keys();
 
         var table = d3.select("#" + id).append('table')
-            .attr("width", width)
+            .attr("width", meassures.width)
             .attr("class", "cohort_table");
 
         var thead = table.append('thead');
@@ -115,17 +124,17 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             .text(function (d) { return d; });
     }
 
-    function showGraph($scope, id, margin, width, height, data, valueFn, formatTime) {
+    function showGraph($scope, id, meassures, data, valueFn, formatTime) {
 
         var svg = d3.select("#" + id)
             .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom);
+            .attr("width", meassures.allWidth)
+            .attr("height", meassures.allHeight);
 
-        var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        var g = svg.append("g").attr("transform", "translate(" + meassures.margin.left + "," + meassures.margin.top + ")");
 
-        var x = d3.scale.linear().range([0, width]),
-            y = d3.scale.linear().range([height, 0]),
+        var x = d3.scale.linear().range([0, meassures.width]),
+            y = d3.scale.linear().range([meassures.height, 0]),
             z = d3.scale.category20();
 
         var line = d3.svg.line()
@@ -181,7 +190,7 @@ module.controller('cohort_controller', function($scope, $element, Private) {
 
         g.append("g")
             .attr("class", "axis axis--x")
-            .attr("transform", "translate(0," + height + ")")
+            .attr("transform", "translate(0," + meassures.height + ")")
             .call(xAxis);
 
         g.append("g")
@@ -235,7 +244,7 @@ module.controller('cohort_controller', function($scope, $element, Private) {
 
     function getValueFunction($scope) {
 
-        var cumulative = function(d) { return d.cumValue; };
+        var cumulative = function(d) { return d.cumulativeValue; };
         var absolute = function(d) { return d.value; };
         var value = $scope.vis.params.cumulative ? cumulative : absolute;
 
@@ -249,7 +258,6 @@ module.controller('cohort_controller', function($scope, $element, Private) {
     function getFormatTime($scope) {
         var schema = $scope.vis.aggs.filter(function(agg) { return agg.schema.name == "cohort_date"; });
         var interval = schema[0].params.interval.val;
-        console.log("schema", schema, interval);
         return formatTypes[interval];
     }
 
@@ -280,8 +288,8 @@ module.controller('cohort_controller', function($scope, $element, Private) {
         var cumulativeData = {};
         data.forEach(function(d) {
             var lastValue = cumulativeData[d.date] ? cumulativeData[d.date] : 0;
-            d.cumValue = lastValue + d.value;
-            cumulativeData[d.date] = d.cumValue;
+            d.cumulativeValue = lastValue + d.value;
+            cumulativeData[d.date] = d.cumulativeValue;
         });
 
         return data;

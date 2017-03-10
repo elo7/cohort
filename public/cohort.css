@@ -56,7 +56,7 @@ div.tooltip {
 }
 
 .cohort_table tr {
-  min-height: 3em;
+  min-height: 40px;
 }
 
 .cohort_table tfoot td {
