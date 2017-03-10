@@ -6,14 +6,26 @@ var module = require('ui/modules').get('cohort');
 module.controller('cohort_controller', function($scope, $element, Private) {
 
     const tabifyAggResponse = Private(AggResponseTabifyTabifyProvider);
-    const formatTime = d3.time.format("%Y-%m-%d");
     const round = function(v){ return Math.round(v * 100) / 100; };
+
+    const formatTypes = {
+        custom : d3.time.format("%Y/%m/%d %H:%M:%S"),
+        ms     : d3.time.format("%Y/%m/%d %H:%M:%S,%L"),
+        s      : d3.time.format("%Y/%m/%d %H:%M:%S"),
+        m      : d3.time.format("%Y/%m/%d %H:%M"),
+        h      : d3.time.format("%Y/%m/%d %H:%M"),
+        d      : d3.time.format("%Y/%m/%d"),
+        w      : d3.time.format("%Y/%m/%d"),
+        M      : d3.time.format("%Y/%m"),
+        y      : d3.time.format("%Y"),
+    };
 
     $scope.$watchMulti(['esResponse', 'vis.params'], function ([resp]) {
         if (!resp) {
             return;
         }
 
+        var formatTime = getFormatTime($scope);
         var data = processData($scope.vis, resp);
         var valueFn = getValueFunction($scope);
 
@@ -25,14 +37,14 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             id = $div.attr('id');
 
         if ($scope.vis.params.table) {
-            showTable($scope, id, width, height, data, valueFn);
+            showTable($scope, id, width, data, valueFn, formatTime);
         } else {
-            showGraph($scope, id, margin, width, height, data, valueFn);
+            showGraph($scope, id, margin, width, height, data, valueFn, formatTime);
         }
 
     });
 
-    function showTable($scope, id, width, height, data, valueFn) {
+    function showTable($scope, id, width, data, valueFn, formatTime) {
 
         var periodMeans = d3.nest().key(function(d) { return d.period; }).entries(data).map(function(d){
             return round(d3.mean(d.values, valueFn));
@@ -47,7 +59,6 @@ module.controller('cohort_controller', function($scope, $element, Private) {
 
         var table = d3.select("#" + id).append('table')
             .attr("width", width)
-            .attr("height", height)
             .attr("class", "cohort_table");
 
         var thead = table.append('thead');
@@ -72,10 +83,17 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             .data(function(row){
                 var date = row.key;
                 var total;
-                var vals = row.values.map(function(d) {
-                    total = d.total;
-                    return valueFn(d);
+                var vals = columns.map(function(period){
+                    var val;
+                    row.values.map(function(d) {
+                        if (period == d.period){
+                            total = d.total;
+                            val = valueFn(d);
+                        }
+                    });
+                    return val;
                 });
+
                 return [total, date].concat(vals);
             })
             .enter()
@@ -97,7 +115,7 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             .text(function (d) { return d; });
     }
 
-    function showGraph($scope, id, margin, width, height, data, valueFn) {
+    function showGraph($scope, id, margin, width, height, data, valueFn, formatTime) {
 
         var svg = d3.select("#" + id)
             .append("svg")
@@ -213,7 +231,6 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             .attr("y", function(d, i){ return i *  20 + 28;})
             .style("font", "10px sans-serif")
             .text(function(d) { return d.key; });
-
     }
 
     function getValueFunction($scope) {
@@ -227,6 +244,13 @@ module.controller('cohort_controller', function($scope, $element, Private) {
 
         return valueFn;
 
+    }
+
+    function getFormatTime($scope) {
+        var schema = $scope.vis.aggs.filter(function(agg) { return agg.schema.name == "cohort_date"; });
+        var interval = schema[0].params.interval.val;
+        console.log("schema", schema, interval);
+        return formatTypes[interval];
     }
 
     function getColorScale($scope, data, valueFn) {
@@ -243,7 +267,6 @@ module.controller('cohort_controller', function($scope, $element, Private) {
     }
 
     function processData($vis, resp) {
-
         var esData = tabifyAggResponse($vis, resp);
         var data = esData.tables[0].rows.map(function(row) {
             return {
@@ -262,7 +285,6 @@ module.controller('cohort_controller', function($scope, $element, Private) {
         });
 
         return data;
-
     }
 });
 

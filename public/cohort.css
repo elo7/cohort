@@ -50,15 +50,13 @@ div.tooltip {
   background-color: #F5F3F3;
 }
 
-.cohort_table tbody td:last-child {
-  -webkit-border-bottom-right-radius: 5px;
-  -moz-border-bottom-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-}
-
 .cohort_table tr:first-child th:last-child,
 .cohort_table tfoot td:last-child {
   border-right: none;
+}
+
+.cohort_table tr {
+  min-height: 3em;
 }
 
 .cohort_table tfoot td {
