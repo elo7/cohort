@@ -2,6 +2,8 @@
 
 ![Chart screenshot](/images/chart.png?raw=true)
 
+![Chart Table screenshot](/images/chart-table.png?raw=true)
+
 ## description
 
 From [Wikipedia](https://en.wikipedia.org/wiki/Cohort_analysis):
