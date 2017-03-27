@@ -96,7 +96,7 @@ module.controller('cohort_controller', function($scope, $element, Private) {
                     var val;
                     row.values.map(function(d) {
                         if (period == d.period){
-                            total = d.total;
+                            total = round(d.total);
                             val = valueFn(d);
                         }
                     });
