@@ -12,15 +12,17 @@ module.controller('cohort_controller', function($scope, $element, Private) {
     const green = "#32c77c";
 
     const formatTypes = {
-        custom : d3.time.format("%Y/%m/%d %H:%M:%S"),
-        ms     : d3.time.format("%Y/%m/%d %H:%M:%S,%L"),
-        s      : d3.time.format("%Y/%m/%d %H:%M:%S"),
-        m      : d3.time.format("%Y/%m/%d %H:%M"),
-        h      : d3.time.format("%Y/%m/%d %H:%M"),
-        d      : d3.time.format("%Y/%m/%d"),
-        w      : d3.time.format("%Y/%m/%d"),
-        M      : d3.time.format("%Y/%m"),
-        y      : d3.time.format("%Y"),
+        undefined : function(d) { return d; },
+        custom    : d3.time.format("%Y/%m/%d %H:%M:%S"),
+        auto      : d3.time.format("%Y/%m/%d %H:%M:%S"),
+        ms        : d3.time.format("%Y/%m/%d %H:%M:%S,%L"),
+        s         : d3.time.format("%Y/%m/%d %H:%M:%S"),
+        m         : d3.time.format("%Y/%m/%d %H:%M"),
+        h         : d3.time.format("%Y/%m/%d %H:%M"),
+        d         : d3.time.format("%Y/%m/%d"),
+        w         : d3.time.format("%Y/%m/%d"),
+        M         : d3.time.format("%Y/%m"),
+        y         : d3.time.format("%Y")
     };
 
     $scope.$watchMulti(['esResponse', 'vis.params'], function ([resp]) {
@@ -28,7 +30,7 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             return;
         }
 
-        var formatTime = getFormatTime($scope);
+        var formatTime = formatTypes[getDateHistogram($scope.vis)];
         var data = processData($scope.vis, resp);
         var valueFn = getValueFunction($scope);
 
@@ -71,9 +73,14 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             return mean;
         });
 
+
         var groupedData = d3.nest().key(function(d) { return formatTime(d.date); }).entries(data);
 
-        var fixedColumns = ["Total", "Date"];
+        var customColumn = "Term";
+        if (getDateHistogram($scope.vis)){
+            customColumn = "Date";
+        }
+        var fixedColumns = ["Total", customColumn];
         var columns = d3.map(data, function(d){return d.period; }).keys();
         var allColumns = fixedColumns.concat(columns);
         var rowsData = d3.map(data, function(d){return d.date; }).keys();
@@ -274,10 +281,11 @@ module.controller('cohort_controller', function($scope, $element, Private) {
 
     }
 
-    function getFormatTime($scope) {
+    function getDateHistogram($vis) {
         var schema = $scope.vis.aggs.filter(function(agg) { return agg.schema.name == "cohort_date"; });
-        var interval = schema[0].params.interval.val;
-        return formatTypes[interval];
+        if (schema[0].type.name == "date_histogram") {
+            return schema[0].params.interval.val;
+        }
     }
 
     function getHeatMapColor(data, valueFn){
@@ -318,8 +326,9 @@ module.controller('cohort_controller', function($scope, $element, Private) {
     function processData($vis, resp) {
         var esData = tabifyAggResponse($vis, resp);
         var data = esData.tables[0].rows.map(function(row) {
+            var dateHistogram = getDateHistogram($vis);
             return {
-                "date": new Date(row[0]),
+                "date": dateHistogram ? new Date(row[0]) : row[0],
                 "total": row[1],
                 "period": row[2],
                 "value": row[3]

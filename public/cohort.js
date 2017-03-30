@@ -49,7 +49,7 @@ function CohortProvider(Private) {
                 title: 'Cohort Date',
                 min: 1,
                 max: 1,
-                aggFilter: 'date_histogram'
+                aggFilter: ['date_histogram', 'terms']
             },
             {
                 group: 'buckets',
