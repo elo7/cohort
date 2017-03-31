@@ -72,6 +72,9 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             minMaxesForColumn.push(minMaxObj);
             return mean;
         });
+        var meanOfMeans = round(d3.mean(periodMeans, function(meanObj){
+            return meanObj;
+        }));
 
 
         var groupedData = d3.nest().key(function(d) { return formatTime(d.date); }).entries(data);
@@ -133,7 +136,8 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             })
             .text(function (d) { return d; });
 
-        var allMeans = ["-", "Mean"].concat(periodMeans);
+        var meanOfMeansTittle = "Mean (" +meanOfMeans+")";
+        var allMeans = ["-",  meanOfMeansTittle].concat(periodMeans);
 
         tfoot.append('tr')
             .selectAll('td')
@@ -141,6 +145,7 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             .enter()
             .append('td')
             .text(function (d) { return d; });
+
     }
 
     function showGraph($scope, id, meassures, data, valueFn, formatTime) {
