@@ -4,6 +4,10 @@
     Show percentual values
   </label>
   <label>
+    <input type="checkbox" ng-model="vis.params.inverse" ng-disabled="!vis.params.percentual" style="margin-left: 20px;">
+    Show inverse values
+  </label>
+  <label>
     <input type="checkbox" ng-model="vis.params.cumulative">
     Show cumulative values
   </label>
@@ -12,7 +16,15 @@
     Show values as table
   </label>
   <label>
-    <input type="checkbox" ng-model="vis.params.mapColors"  ng-disabled="!vis.params.table" >
+    <input type="radio" ng-model="vis.params.mapColors" value="heatmap" ng-disabled="!vis.params.table" style="margin-left: 20px;">
     Show heatmap colors
+  </label>
+  <label>
+    <input type="radio" ng-model="vis.params.mapColors" value="mean" ng-disabled="!vis.params.table" style="margin-left: 20px;">
+    Show heatmap colors, by columns
+  </label>
+  <label>
+    <input type="radio" ng-model="vis.params.mapColors" value="aboveAverage" ng-disabled="!vis.params.table" style="margin-left: 20px;">
+    Show above average colors
   </label>
 </div>

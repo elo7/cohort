@@ -7,17 +7,22 @@ module.controller('cohort_controller', function($scope, $element, Private) {
 
     const tabifyAggResponse = Private(AggResponseTabifyTabifyProvider);
     const round = function(v){ return Math.round(v * 100) / 100; };
+    const red = "#ff4e61";
+    const yellow = "#ffef7d";
+    const green = "#32c77c";
 
     const formatTypes = {
-        custom : d3.time.format("%Y/%m/%d %H:%M:%S"),
-        ms     : d3.time.format("%Y/%m/%d %H:%M:%S,%L"),
-        s      : d3.time.format("%Y/%m/%d %H:%M:%S"),
-        m      : d3.time.format("%Y/%m/%d %H:%M"),
-        h      : d3.time.format("%Y/%m/%d %H:%M"),
-        d      : d3.time.format("%Y/%m/%d"),
-        w      : d3.time.format("%Y/%m/%d"),
-        M      : d3.time.format("%Y/%m"),
-        y      : d3.time.format("%Y"),
+        undefined : function(d) { return d; },
+        custom    : d3.time.format("%Y/%m/%d %H:%M:%S"),
+        auto      : d3.time.format("%Y/%m/%d %H:%M:%S"),
+        ms        : d3.time.format("%Y/%m/%d %H:%M:%S,%L"),
+        s         : d3.time.format("%Y/%m/%d %H:%M:%S"),
+        m         : d3.time.format("%Y/%m/%d %H:%M"),
+        h         : d3.time.format("%Y/%m/%d %H:%M"),
+        d         : d3.time.format("%Y/%m/%d"),
+        w         : d3.time.format("%Y/%m/%d"),
+        M         : d3.time.format("%Y/%m"),
+        y         : d3.time.format("%Y")
     };
 
     $scope.$watchMulti(['esResponse', 'vis.params'], function ([resp]) {
@@ -25,7 +30,7 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             return;
         }
 
-        var formatTime = getFormatTime($scope);
+        var formatTime = formatTypes[getDateHistogram($scope.vis)];
         var data = processData($scope.vis, resp);
         var valueFn = getValueFunction($scope);
 
@@ -55,13 +60,30 @@ module.controller('cohort_controller', function($scope, $element, Private) {
 
     function showTable($scope, id, meassures, data, valueFn, formatTime) {
 
+        var minMaxesForColumn = []
         var periodMeans = d3.nest().key(function(d) { return d.period; }).entries(data).map(function(d){
-            return round(d3.mean(d.values, valueFn));
+            var minMax = d3.extent(d.values, valueFn);
+            var mean = round(d3.mean(d.values, valueFn));
+            var minMaxObj = {
+                min: minMax[0],
+                max: minMax[1],
+                mean: mean
+            }
+            minMaxesForColumn.push(minMaxObj);
+            return mean;
         });
+        var meanOfMeans = round(d3.mean(periodMeans, function(meanObj){
+            return meanObj;
+        }));
+
 
         var groupedData = d3.nest().key(function(d) { return formatTime(d.date); }).entries(data);
 
-        var fixedColumns = ["Total", "Date"];
+        var customColumn = "Term";
+        if (getDateHistogram($scope.vis)){
+            customColumn = "Date";
+        }
+        var fixedColumns = ["Total", customColumn];
         var columns = d3.map(data, function(d){return d.period; }).keys();
         var allColumns = fixedColumns.concat(columns);
         var rowsData = d3.map(data, function(d){return d.date; }).keys();
@@ -96,7 +118,7 @@ module.controller('cohort_controller', function($scope, $element, Private) {
                     var val;
                     row.values.map(function(d) {
                         if (period == d.period){
-                            total = d.total;
+                            total = round(d.total);
                             val = valueFn(d);
                         }
                     });
@@ -109,12 +131,13 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             .append('td')
             .style("background-color", function(d,i) {
                 if (i >= 2) { // skip first and second columns
-                    return colorScale(d);
+                    return colorScale(d, minMaxesForColumn[i - 2]);
                 }
             })
             .text(function (d) { return d; });
 
-        var allMeans = ["-", "Mean"].concat(periodMeans);
+        var meanOfMeansTittle = "Mean (" +meanOfMeans+")";
+        var allMeans = ["-",  meanOfMeansTittle].concat(periodMeans);
 
         tfoot.append('tr')
             .selectAll('td')
@@ -122,6 +145,7 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             .enter()
             .append('td')
             .text(function (d) { return d; });
+
     }
 
     function showGraph($scope, id, meassures, data, valueFn, formatTime) {
@@ -249,25 +273,55 @@ module.controller('cohort_controller', function($scope, $element, Private) {
         var value = $scope.vis.params.cumulative ? cumulative : absolute;
 
         var percent = function(d) { return round( (value(d) / d.total) * 100 ); };
-        var valueFn = $scope.vis.params.percentual ? percent : value;
+        var inverse = function(d) { return round( 100 - (value(d) / d.total) * 100 ); };
+        if($scope.vis.params.percentual) {
+            if ($scope.vis.params.inverse) {
+                return inverse;
+            } else {
+                return percent;
+            }
+        }
 
-        return valueFn;
+        return value;
 
     }
 
-    function getFormatTime($scope) {
+    function getDateHistogram($vis) {
         var schema = $scope.vis.aggs.filter(function(agg) { return agg.schema.name == "cohort_date"; });
-        var interval = schema[0].params.interval.val;
-        return formatTypes[interval];
+        if (schema[0].type.name == "date_histogram") {
+            return schema[0].params.interval.val;
+        }
     }
 
-    function getColorScale($scope, data, valueFn) {
-        if ($scope.vis.params.mapColors) {
+    function getHeatMapColor(data, valueFn){
+        var domain = d3.extent(data, valueFn);
+        domain.splice(1, 0, d3.mean(domain));
+        return d3.scale.linear().domain(domain).range([red, yellow, green]);
+    }
 
-            var domain = d3.extent(data, valueFn);
-            domain.splice(1, 0, d3.mean(domain));
+    function getMeanColor(d, column){
+        return d3.scale.linear().domain([column.min, column.mean, column.max]).range([red, yellow, green])(d);
+    }
 
-            return d3.scale.linear().domain(domain).range(["#ff4e61","#ffef7d","#32c77c"]);
+    function getAboveAverageColor(d, column){
+        if(d > column.mean){
+            return green;
+        } else if(d == column.mean) {
+            return yellow;
+        } else if (d < column.mean){
+            return red;
+        }
+    }
+
+   function getColorScale($scope, data, valueFn) {
+        if ($scope.vis.params.mapColors == "heatmap") {
+            return getHeatMapColor(data, valueFn);
+
+        } else if ($scope.vis.params.mapColors == "mean"){
+            return getMeanColor;
+
+        } else if ($scope.vis.params.mapColors == "aboveAverage") {
+            return getAboveAverageColor;
 
         } else {
             return function(d) { };
@@ -277,8 +331,9 @@ module.controller('cohort_controller', function($scope, $element, Private) {
     function processData($vis, resp) {
         var esData = tabifyAggResponse($vis, resp);
         var data = esData.tables[0].rows.map(function(row) {
+            var dateHistogram = getDateHistogram($vis);
             return {
-                "date": new Date(row[0]),
+                "date": dateHistogram ? new Date(row[0]) : row[0],
                 "total": row[1],
                 "period": row[2],
                 "value": row[3]
