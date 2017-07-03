@@ -235,7 +235,7 @@ module.controller('cohort_controller', function($scope, $element, Private) {
             .attr("class", "cohortDate");
 
         cohortDate.append("path")
-            .attr("class", "line")
+            .attr("class", "cohort_line")
             .attr("d", function(d) { return line(d.values); })
             .style("stroke", function(d) { return z(d.key); });
 
