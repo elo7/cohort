@@ -1,17 +1,18 @@
 // Include the angular controller
 
-import 'plugins/cohort/cohort.css'
-import cohort_controller from 'plugins/cohort/cohort_controller';
 import cohort_params_template from 'plugins/cohort/cohort_params.html';
-import TemplateVisTypeTemplateVisTypeProvider from 'ui/template_vis_type/template_vis_type';
-import VisSchemasProvider from 'ui/vis/schemas';
+import cohort_template from 'plugins/cohort/cohort.html';
+import { VisSchemasProvider } from 'ui/vis/schemas';
+import { TemplateVisTypeProvider } from 'ui/template_vis_type/template_vis_type';
+import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
 
-// The provider function, which must return our new visualization type
+import 'plugins/cohort/cohort_controller';
+import 'plugins/cohort/cohort.css'
 
-function CohortProvider(Private) {
+VisTypesRegistryProvider.register(function CohortProvider(Private) {
 
     // Describe our visualization
-    const TemplateVisType = Private(TemplateVisTypeTemplateVisTypeProvider);
+    const TemplateVisType = Private(TemplateVisTypeProvider);
     const Schemas = Private(VisSchemasProvider);
 
     return new TemplateVisType({
@@ -19,7 +20,7 @@ function CohortProvider(Private) {
         title: 'Cohort Analysis',
         description: 'Cohort analysis plugin',
         icon: 'fa-user', // The font awesome icon of this visualization
-        template: require('plugins/cohort/cohort.html'),
+        template: cohort_template,
         params: {
             defaults: {
                 percentual: false
@@ -61,6 +62,5 @@ function CohortProvider(Private) {
             }
         ])
     });
-}
+});
 
-require('ui/registry/vis_types').register(CohortProvider);
