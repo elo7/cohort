@@ -1,11 +1,12 @@
 
 import d3 from 'd3';
-import AggResponseTabifyTabifyProvider from 'ui/agg_response/tabify/tabify';
-var module = require('ui/modules').get('cohort');
+import { AggResponseTabifyProvider } from 'ui/agg_response/tabify/tabify';
+import { uiModules } from 'ui/modules';
 
+const module = uiModules.get('cohort');
 module.controller('cohort_controller', function($scope, $element, Private) {
 
-    const tabifyAggResponse = Private(AggResponseTabifyTabifyProvider);
+    const tabifyAggResponse = Private(AggResponseTabifyProvider);
     const round = function(v){ return Math.round(v * 100) / 100; };
     const red = "#ff4e61";
     const yellow = "#ffef7d";
