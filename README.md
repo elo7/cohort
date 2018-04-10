@@ -54,8 +54,8 @@ For more information about any of these commands run `npm run ${task} -- --help`
 Remember that the plugin version in `package.json` must match Kibana version.
 
 ```
-export $VERSION=<kibana_version>
-export $GITHUB_TOKEN=<token>
+export VERSION=<kibana_version>
+export GITHUB_TOKEN=<token>
 
 npm install
 

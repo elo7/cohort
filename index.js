@@ -1,18 +1,16 @@
-
-
-export default function (kibana) {
+export default kibana => {
   return new kibana.Plugin({
+    id: 'cohort',
     require: ['elasticsearch'],
 
     uiExports: {
-      visTypes: ['plugins/cohort/cohort']
+      visTypes: [
+        'plugins/cohort/cohort'
+      ]
     },
 
-    config(Joi) {
-      return Joi.object({
-        enabled: Joi.boolean().default(true),
-      }).default();
-    }
-
+    config: (Joi) => Joi.object({
+      enabled: Joi.boolean().default(true)
+    }).default(),
   });
-};
+}
