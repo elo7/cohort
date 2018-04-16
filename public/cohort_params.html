@@ -3,28 +3,56 @@
     <input type="checkbox" ng-model="vis.params.percentual">
     Show percentual values
   </label>
+</div>
+<div class="checkbox">
   <label>
-    <input type="checkbox" ng-model="vis.params.inverse" ng-disabled="!vis.params.percentual" style="margin-left: 20px;">
+    <input type="checkbox" ng-model="vis.params.inverse"
+           ng-disabled="!vis.params.percentual"
+           style="margin-left: 20px;">
     Show inverse values
   </label>
+</div>
+<div class="checkbox">
   <label>
     <input type="checkbox" ng-model="vis.params.cumulative">
     Show cumulative values
   </label>
+</div>
+<div class="checkbox">
   <label>
     <input type="checkbox" ng-model="vis.params.table">
     Show values as table
   </label>
+</div>
+<div class="checkbox">
   <label>
-    <input type="radio" ng-model="vis.params.mapColors" value="heatmap" ng-disabled="!vis.params.table" style="margin-left: 20px;">
+    <input type="radio" ng-model="vis.params.mapColors" value=""
+           ng-disabled="!vis.params.table"
+           style="margin-left: 20px; margin-right: 4px;">
+    No heatmap colors
+  </label>
+</div>
+<div class="checkbox">
+  <label>
+    <input type="radio" ng-model="vis.params.mapColors" value="heatmap"
+           ng-disabled="!vis.params.table"
+           style="margin-left: 20px; margin-right: 4px;">
     Show heatmap colors
   </label>
+</div>
+<div class="checkbox">
   <label>
-    <input type="radio" ng-model="vis.params.mapColors" value="mean" ng-disabled="!vis.params.table" style="margin-left: 20px;">
+    <input type="radio" ng-model="vis.params.mapColors" value="mean"
+           ng-disabled="!vis.params.table"
+           style="margin-left: 20px; margin-right: 4px;">
     Show heatmap colors, by columns
   </label>
+</div>
+<div class="checkbox">
   <label>
-    <input type="radio" ng-model="vis.params.mapColors" value="aboveAverage" ng-disabled="!vis.params.table" style="margin-left: 20px;">
+    <input type="radio" ng-model="vis.params.mapColors" value="aboveAverage"
+           ng-disabled="!vis.params.table"
+           style="margin-left: 20px; margin-right: 4px;">
     Show above average colors
   </label>
 </div>

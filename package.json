@@ -3,6 +3,9 @@
   "version": "5.6.8",
   "description": "Cohort Analysis plugin built with love at Elo7",
   "main": "index.js",
+  "kibana": {
+    "version": "kibana"
+  },
   "scripts": {
     "lint": "eslint",
     "start": "plugin-helpers start",
@@ -13,7 +16,7 @@
   },
   "devDependencies": {
     "@elastic/eslint-config-kibana": "0.0.2",
-    "@elastic/plugin-helpers": "5.1.0",
+    "@elastic/plugin-helpers": "^6.0.0",
     "babel-eslint": "4.1.8",
     "chai": "^3.5.0",
     "eslint": "1.10.3",
