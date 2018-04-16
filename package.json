@@ -1,6 +1,6 @@
 {
   "name": "cohort",
-  "version": "6.0.1",
+  "version": "6.1.0",
   "description": "Cohort Analysis plugin built with love at Elo7",
   "main": "index.js",
   "scripts": {
