@@ -18,7 +18,7 @@ From [Wikipedia](https://en.wikipedia.org/wiki/Cohort_analysis):
 ## install
 
 ```
-bin/kibana-plugin install https://github.com/elo7/cohort/releases/download/5.3.0/cohort-5.3.0.zip
+bin/kibana-plugin install https://github.com/elo7/cohort/releases/download/6.2.3/cohort-6.2.3.zip
 ```
 
 ## uninstall
