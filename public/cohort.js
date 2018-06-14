@@ -21,7 +21,8 @@ VisTypesRegistryProvider.register(function CohortProvider(Private) {
     category: CATEGORY.OTHER,
     visConfig: {
       defaults: {
-        mapColors: ''
+        mapColors: '',
+        hiddenColumns: ''
       },
       template: template,
     },

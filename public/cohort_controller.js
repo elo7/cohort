@@ -14,7 +14,8 @@ module.controller('cohortController', function ($scope, $element, Private) {
     'vis.params.cumulative',
     'vis.params.table',
     'vis.params.mapColors',
-    'vis.params.reverseColors'
+    'vis.params.reverseColors',
+    'vis.params.hiddenColumns'
   ], ([resp]) => {
     if (!resp) {
       return;

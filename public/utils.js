@@ -24,6 +24,9 @@ export const absoluteFn = (d) => d.value;
 export const getFormatTypes = ($vis) => formatTypes[getDateHistogram($vis)];
 
 export function showTable($vis, mapColors, element, measures, data, valueFn, formatTime) {
+  var periodsToExclude = $vis.params.hiddenColumns ? $vis.params.hiddenColumns.split(";") : [];
+  data = data.filter(function(d) { return periodsToExclude.indexOf(d.period.toString()) == -1 });
+
   let minMaxesForColumn = [];
   const periodMeans = d3.nest().key((d) => d.period)
   .entries(data).map((d) => {

@@ -65,4 +65,10 @@
       Reverse color scheme
     </label>
   </div>
+  <div class="form-group" style="margin-left: 20px; margin-right: 4px;">
+    <label for="hiddenColumns">Columns to hide (separated by semicolons)</label>
+    <input ng-model="vis.params.hiddenColumns"
+           ng-disabled="!vis.params.table"
+           class="form-control" id="hiddenColumns">
+  </div>
 </div>
