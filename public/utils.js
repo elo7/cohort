@@ -64,7 +64,7 @@ export function showTable($vis, mapColors, element, measures, data, valueFn, for
   .enter()
   .append('tr');
 
-  const colorScale = getColorScale(mapColors, data, valueFn);
+  const colorScale = getColorScale(mapColors, $vis.params.reverseColors, data, valueFn);
 
   rows.selectAll('td')
   .data((row) => {
@@ -242,33 +242,42 @@ export function getDateHistogram($vis) {
   }
 }
 
-export function getHeatMapColor(data, valueFn) {
+export function getHeatMapColor(data, scale, valueFn) {
   const domain = d3.extent(data, valueFn);
   domain.splice(1, 0, d3.mean(domain));
-  return d3.scale.linear().domain(domain).range(colors);
+  return d3.scale.linear().domain(domain).range(scale);
 }
 
-export function getMeanColor(d, column) {
-  return d3.scale.linear().domain([column.min, column.mean, column.max]).range(colors)(d);
+export function getMeanColor(scale) {
+  return (d, column) => {
+    return d3.scale.linear().domain([column.min, column.mean, column.max]).range(scale)(d);
+  };
 }
 
-export function getAboveAverageColor(d, column) {
-  if (d > column.mean) {
-    return green;
-  } else if (d === column.mean) {
-    return yellow;
-  } else if (d < column.mean) {
-    return red;
+export function getAboveAverageColor(scale) {
+  return (d, column) => {
+    if (d > column.mean) {
+      return scale[0];
+    } else if (d === column.mean) {
+      return scale[1];
+    } else if (d < column.mean) {
+      return scale[2];
+    }
   }
 }
 
-export function getColorScale(mapColors, data, valueFn) {
+export function getColorScale(mapColors, reverseColors, data, valueFn) {
+  var scale = colors;
+  if (reverseColors) {
+    scale = colors.slice().reverse();
+  }
+
   if (mapColors === 'heatmap') {
-    return getHeatMapColor(data, valueFn);
+    return getHeatMapColor(data, scale, valueFn);
   } else if (mapColors === 'mean') {
-    return getMeanColor;
+    return getMeanColor(scale);
   } else if (mapColors === 'aboveAverage') {
-    return getAboveAverageColor;
+    return getAboveAverageColor(scale);
   } else {
     return (d) => {
     };
