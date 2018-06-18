@@ -54,7 +54,7 @@ VisTypesRegistryProvider.register(function CohortProvider(Private) {
           title: 'Cohort Period',
           min: 1,
           max: 1,
-          aggFilter: 'histogram'
+          aggFilter: ['date_histogram', 'histogram']
         }
       ])
     }

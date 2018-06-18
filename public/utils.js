@@ -44,7 +44,13 @@ export function showTable($vis, mapColors, element, measures, data, valueFn, for
   const customColumn = getDateHistogram($vis) ? 'Date' : 'Term';
   const fixedColumns = ['Total', customColumn];
   const columns = d3.map(data, (d) => d.period).keys().map(x => parseInt(x, 10)).sort((a, b) => a - b);
-  const allColumns = fixedColumns.concat(columns);
+  const allColumns = fixedColumns.concat(columns.map(function(x) {
+    if (getPeriodAggregationName($vis) == 'date_histogram') {
+      return formatTime(new Date(x));
+    } else {
+      return x;
+    }
+  }));
 
   const table = d3.select(element).append('table')
   .attr('width', measures.width)
@@ -243,6 +249,14 @@ export function getDateHistogram($vis) {
   if (schema && schema.type.name === 'date_histogram') {
     return schema.params.interval.val;
   }
+}
+
+export function getPeriodAggregationName($vis) {
+  const schema = $vis.aggs.find((agg) => agg.schema.name === 'cohort_period');
+  if (!schema) {
+    return null;
+  }
+  return schema.type.name;
 }
 
 export function getHeatMapColor(data, scale, valueFn) {
