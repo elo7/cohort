@@ -43,7 +43,7 @@ export function showTable($vis, mapColors, element, measures, data, valueFn, for
 
   const customColumn = getDateHistogram($vis) ? 'Date' : 'Term';
   const fixedColumns = ['Total', customColumn];
-  const columns = d3.map(data, (d) => d.period).keys().map(x => parseInt(x, 10));
+  const columns = d3.map(data, (d) => d.period).keys().map(x => parseInt(x, 10)).sort((a, b) => a - b);
   const allColumns = fixedColumns.concat(columns);
 
   const table = d3.select(element).append('table')
