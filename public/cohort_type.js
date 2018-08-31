@@ -8,7 +8,7 @@ import { CohortVisualizationProvider } from './cohort_visualization';
 import './cohort.less';
 import optionsTemplate from './options_template.html';
 
-VisTypesRegistryProvider.register((Private) => {
+export default function CohortTypeProvider(Private) {
   const VisFactory = Private(VisFactoryProvider);
   const _Schemas = Schemas || Private(VisSchemasProvider);
 
@@ -76,4 +76,6 @@ VisTypesRegistryProvider.register((Private) => {
       ]),
     },
   });
-});
+}
+
+VisTypesRegistryProvider.register(CohortTypeProvider);
