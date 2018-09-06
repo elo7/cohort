@@ -1,0 +1,74 @@
+.cohort-line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2.5px;
+}
+
+div.tooltip {
+  border: 0;
+  border-radius: 8px;
+  font: 12px sans-serif;
+  height: 32px;
+  padding: 2px;
+  position: absolute;
+  pointer-events: none;
+  text-align: center;
+  width: 100px;
+  z-index: 1;
+}
+
+.cohort-container {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: row;
+  overflow: auto;
+}
+
+.cohort-table {
+  background-color: #F5F3F3;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  border-spacing: 0;
+  border-collapse: collapse;
+  font-size: 9pt;
+  margin: 10px auto;
+  width: calc(~"100% - 70px");
+
+  tr:last-child td,
+  tfoot td {
+    border-bottom: none;
+  }
+
+  thead tr th:nth-child(-n + 2) {
+    min-width: 70px;
+  }
+
+  th,
+  tbody tr td:nth-child(-n + 2),
+  tfoot td {
+    border-bottom: 1px solid #E4E4E4;
+    border-right: 1px solid #E4E4E4;
+    color: #3A3838;
+    font-weight: bold;
+  }
+
+  tr:first-child th:last-child,
+  tfoot td:last-child {
+    border-right: none;
+  }
+
+  tr {
+    min-height: 40px;
+  }
+
+  tfoot td {
+    border-top: 1px solid #E4E4E4;
+  }
+
+  th, td {
+    padding: 10px;
+    text-align: center;
+    width: 42px;
+  }
+}
