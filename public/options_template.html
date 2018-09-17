@@ -1,0 +1,60 @@
+<div class="kuiSideBarSection" ng-init="editorState = editorState || vis">
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" ng-model="editorState.params.percentual">
+      Show percentual values
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" ng-model="editorState.params.inverse"
+             ng-disabled="!editorState.params.percentual"
+             style="margin-left: 20px;">
+      Show inverse values
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" ng-model="editorState.params.cumulative">
+      Show cumulative values
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" ng-model="editorState.params.table">
+      Show values as table
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="radio" ng-model="editorState.params.mapColors" value=""
+             ng-disabled="!editorState.params.table"
+             style="margin-left: 20px; margin-right: 4px;">
+      No heatmap colors
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="radio" ng-model="editorState.params.mapColors" value="heatmap"
+             ng-disabled="!editorState.params.table"
+             style="margin-left: 20px; margin-right: 4px;">
+      Show heatmap colors
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="radio" ng-model="editorState.params.mapColors" value="mean"
+             ng-disabled="!editorState.params.table"
+             style="margin-left: 20px; margin-right: 4px;">
+      Show heatmap colors, by columns
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="radio" ng-model="editorState.params.mapColors" value="aboveAverage"
+             ng-disabled="!editorState.params.table"
+             style="margin-left: 20px; margin-right: 4px;">
+      Show above average colors
+    </label>
+  </div>
+</div>
