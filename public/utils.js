@@ -365,7 +365,13 @@ const parseNumber = (x) => {
  * @returns {array}
  */
 export function processData(esData, dateHistogram) {
-  if (!(Array.isArray(esData.tables) && esData.tables.length)) {
+  if (!(Array.isArray(esData.tables) && esData.tables.length
+    && Array.isArray(esData.tables[0].rows[0]))) {
+    return [];
+  }
+
+  const noResults = esData.tables[0].rows[0].every((row) => row === '');
+  if (noResults) {
     return [];
   }
 
@@ -385,4 +391,24 @@ export function processData(esData, dateHistogram) {
     cumulativeData[d.date] = d.cumulativeValue;
     return d;
   });
+}
+
+/**
+ * @param {object} esData
+ * @returns {object}
+ */
+export function tabifyResponseHandler(esData) {
+  if (Array.isArray(esData.tables)) {
+    return esData;
+  }
+
+  if (Array.isArray(esData.columns) && Array.isArray(esData.rows)) {
+    const columns = esData.columns.map(({ id }) => id);
+
+    const rows = esData.rows.map((row) => columns.map(id => row[id]));
+
+    return { tables: [{ rows }] };
+  }
+
+  return {};
 }
