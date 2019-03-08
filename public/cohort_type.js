@@ -29,7 +29,6 @@ export default function CohortTypeProvider(Private) {
       },
     },
     hierarchicalData: true,
-    responseHandler: 'none',
     editorConfig: {
       optionsTemplate: optionsTemplate,
       schemas: new _Schemas([
