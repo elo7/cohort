@@ -1,6 +1,5 @@
 import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
 import { VisFactoryProvider } from 'ui/vis/vis_factory';
-import { CATEGORY } from 'ui/vis/vis_category';
 import { Schemas, VisSchemasProvider } from 'ui/vis/editors/default/schemas';
 
 import { CohortVisualizationProvider } from './cohort_visualization';
@@ -17,7 +16,6 @@ export default function CohortTypeProvider(Private) {
     title: 'Cohort Analysis',
     icon: 'fa-user',
     description: 'Cohort analysis plugin',
-    category: CATEGORY.OTHER,
     visualization: Private(CohortVisualizationProvider),
     visConfig: {
       defaults: {
@@ -26,10 +24,11 @@ export default function CohortTypeProvider(Private) {
         cumulative: false,
         table: false,
         mapColors: 'heatmap',
+        reverseColors: false,
+        hiddenColumns: '',
       },
     },
     hierarchicalData: true,
-    responseHandler: 'none',
     editorConfig: {
       optionsTemplate: optionsTemplate,
       schemas: new _Schemas([
@@ -64,7 +63,7 @@ export default function CohortTypeProvider(Private) {
           title: 'Cohort Period',
           min: 1,
           max: 1,
-          aggFilter: 'histogram',
+          aggFilter: ['date_histogram', 'histogram'],
           defaults: [
             {
               type: 'histogram', schema: 'cohort_period', params: {

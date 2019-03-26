@@ -57,4 +57,18 @@
       Show above average colors
     </label>
   </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" ng-model="editorState.params.reverseColors"
+             ng-disabled="!editorState.params.table"
+             style="margin-left: 20px; margin-right: 4px;">
+      Reverse color scheme
+    </label>
+  </div>
+  <div class="form-group" style="margin-left: 20px; margin-right: 4px;">
+    <label for="hiddenColumns">Columns to hide (separated by semicolons)</label>
+    <input ng-model="editorState.params.hiddenColumns"
+           ng-disabled="!editorState.params.table"
+           class="form-control" id="hiddenColumns">
+  </div>
 </div>

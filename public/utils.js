@@ -56,7 +56,10 @@ export const getFormatTypes = (dateHistogram) => formatTypes[dateHistogram];
  * @param {function} valueFn
  * @param {function} formatTime
  */
-export function showTable(mapColors, dateHistogram, element, data, valueFn, formatTime) {
+export function showTable(mapColors, reverseColors, hiddenColumns, aggs, dateHistogram, element, data, valueFn, formatTime) {
+  var periodsToExclude = hiddenColumns ? hiddenColumns.split(";") : [];
+  data = data.filter(function(d) { return periodsToExclude.indexOf(d.period.toString()) == -1 });
+
   const minMaxesForColumn = [];
   const periodMeans = d3.nest().key((d) => d.period)
     .entries(data).map((d) => {
@@ -73,8 +76,14 @@ export function showTable(mapColors, dateHistogram, element, data, valueFn, form
 
   const customColumn = dateHistogram ? 'Date' : 'Term';
   const fixedColumns = ['Total', customColumn];
-  const columns = d3.map(data, (d) => d.period).keys().map(x => parseInt(x, 10));
-  const allColumns = fixedColumns.concat(columns);
+  const columns = d3.map(data, (d) => d.period).keys().map(x => parseInt(x, 10)).sort((a, b) => a - b);
+  const allColumns = fixedColumns.concat(columns.map(function(x) {
+    if (getPeriodAggregationName(aggs) == 'date_histogram') {
+      return formatTime(new Date(x));
+    } else {
+      return x;
+    }
+  }));
 
   const table = d3.select(element).append('table')
     .attr('class', tableClassName);
@@ -96,7 +105,7 @@ export function showTable(mapColors, dateHistogram, element, data, valueFn, form
     .enter()
     .append('tr');
 
-  const colorScale = getColorScale(mapColors, data, valueFn);
+  const colorScale = getColorScale(mapColors, reverseColors, data, valueFn);
 
   rows.selectAll('td')
     .data((row) => {
@@ -294,15 +303,23 @@ export function getDateHistogram($vis) {
   }
 }
 
+export function getPeriodAggregationName(aggs) {
+  const schema = aggs.find((agg) => agg.schema.name === 'cohort_period');
+  if (!schema) {
+    return null;
+  }
+  return schema.type.name;
+}
+
 /**
  * @param {array} data
  * @param {function} valueFn
  * @returns {function}
  */
-export function getHeatMapColor(data, valueFn) {
+export function getHeatMapColor(data, scale, valueFn) {
   const domain = d3.extent(data, valueFn);
   domain.splice(1, 0, d3.mean(domain));
-  return d3.scale.linear().domain(domain).range(colors);
+  return d3.scale.linear().domain(domain).range(scale);
 }
 
 /**
@@ -310,8 +327,10 @@ export function getHeatMapColor(data, valueFn) {
  * @param {object} column
  * @returns {string}
  */
-export function getMeanColor(d, column) {
-  return d3.scale.linear().domain([column.min, column.mean, column.max]).range(colors)(d);
+export function getMeanColor(scale) {
+  return (d, column) => {
+    return d3.scale.linear().domain([column.min, column.mean, column.max]).range(scale)(d);
+  };
 }
 
 /**
@@ -319,13 +338,15 @@ export function getMeanColor(d, column) {
  * @param {object} column
  * @returns {string}
  */
-export function getAboveAverageColor(d, column) {
-  if (d > column.mean) {
-    return green;
-  } else if (d === column.mean) {
-    return yellow;
-  } else if (d < column.mean) {
-    return red;
+export function getAboveAverageColor(scale) {
+  return (d, column) => {
+    if (d > column.mean) {
+      return scale[0];
+    } else if (d === column.mean) {
+      return scale[1];
+    } else if (d < column.mean) {
+      return scale[2];
+    }
   }
 }
 
@@ -335,13 +356,18 @@ export function getAboveAverageColor(d, column) {
  * @param {function} valueFn
  * @returns {function}
  */
-export function getColorScale(mapColors, data, valueFn) {
+export function getColorScale(mapColors, reverseColors, data, valueFn) {
+  var scale = colors;
+  if (reverseColors) {
+    scale = colors.slice().reverse();
+  }
+
   if (mapColors === 'heatmap') {
-    return getHeatMapColor(data, valueFn);
+    return getHeatMapColor(data, scale, valueFn);
   } else if (mapColors === 'mean') {
-    return getMeanColor;
+    return getMeanColor(scale);
   } else if (mapColors === 'aboveAverage') {
-    return getAboveAverageColor;
+    return getAboveAverageColor(scale);
   } else {
     return () => {
     };
@@ -365,7 +391,13 @@ const parseNumber = (x) => {
  * @returns {array}
  */
 export function processData(esData, dateHistogram) {
-  if (!(Array.isArray(esData.tables) && esData.tables.length)) {
+  if (!(Array.isArray(esData.tables) && esData.tables.length
+    && Array.isArray(esData.tables[0].rows[0]))) {
+    return [];
+  }
+
+  const noResults = esData.tables[0].rows[0].every((row) => row === '');
+  if (noResults) {
     return [];
   }
 
@@ -385,4 +417,24 @@ export function processData(esData, dateHistogram) {
     cumulativeData[d.date] = d.cumulativeValue;
     return d;
   });
+}
+
+/**
+ * @param {object} esData
+ * @returns {object}
+ */
+export function tabifyResponseHandler(esData) {
+  if (Array.isArray(esData.tables)) {
+    return esData;
+  }
+
+  if (Array.isArray(esData.columns) && Array.isArray(esData.rows)) {
+    const columns = esData.columns.map(({ id }) => id);
+
+    const rows = esData.rows.map((row) => columns.map(id => row[id]));
+
+    return { tables: [{ rows }] };
+  }
+
+  return {};
 }
