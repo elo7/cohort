@@ -1,6 +1,5 @@
 import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
 import { VisFactoryProvider } from 'ui/vis/vis_factory';
-import { CATEGORY } from 'ui/vis/vis_category';
 import { Schemas, VisSchemasProvider } from 'ui/vis/editors/default/schemas';
 
 import { CohortVisualizationProvider } from './cohort_visualization';
@@ -17,7 +16,6 @@ export default function CohortTypeProvider(Private) {
     title: 'Cohort Analysis',
     icon: 'fa-user',
     description: 'Cohort analysis plugin',
-    category: CATEGORY.OTHER,
     visualization: Private(CohortVisualizationProvider),
     visConfig: {
       defaults: {
